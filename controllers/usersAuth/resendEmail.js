@@ -22,7 +22,7 @@ const resendEmail = async (req, res) => {
   const mail = {
     to: email,
     subject: "Phonebook app registration approvement",
-    html: `<a target="_blank" href="http://localhost:3000/api/users/verify/${verificationToken}">Click to verify</a>`,
+    html: `<a target="_blank" href="http://localhost:3000/users/verify/${verificationToken}">Click to verify</a>`,
   };
   await sendEmail(mail);
   res.json({
