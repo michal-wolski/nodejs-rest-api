@@ -1,6 +1,8 @@
 const { User, schemas } = require("../../models/user");
 const bcrypt = require("bcryptjs");
 const gravatar = require("gravatar");
+const { nanoid } = require("nanoid");
+const { emileSend } = require("../../utils");
 
 const register = async (req, res, next) => {
   const { error } = schemas.register.validate(req.body);
@@ -17,12 +19,20 @@ const register = async (req, res, next) => {
   try {
     const hashPassword = await bcrypt.hash(password, 10);
     const hashEmail = await gravatar.url(email);
+    const verificationToken = nanoid();
     const result = await User.create({
       ...req.body,
       password: hashPassword,
-      avatarURL,
+      avatarURL: hashEmail,
+      verificationToken,
     });
-
+    const mail = {
+      to: email,
+      subject: "Emaile Verify",
+      text: "Verify you emile.",
+      html: `<a target="_blank" href="http://localhost:3000/users/verify/${verificationToken}">Click to verify</a>`,
+    };
+    await emileSend(mail);
     res.status(201).json({
       user: {
         name: result.name,
